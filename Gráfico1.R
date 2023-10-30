@@ -23,9 +23,11 @@ theme_estat <- function(...) {
 }
 
 
+legendas <- str_squish(str_c(tabela_2$Total))
+
 ggplot(tabela_2) +
   aes(
-    x = fct_reorder('month(Data.Venda)', Total, .desc = T), y = Total,
+    x = fct_reorder(as_factor(mes), mes), y = Total,
     fill = Category, label = legendas
   ) +
   geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
