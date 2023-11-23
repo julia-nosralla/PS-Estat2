@@ -1,7 +1,7 @@
 library(tidyverse)
 library(scales)
 
-cores_estat <- c("#000000", "#003366", "#006606", "#A11D21", "#F0FFF0", "#CC9900", "#663333", "#FF6600", "#CC9966", "#999966", "#006606", "#008091", "#041835", "#666666")
+cores_estat <- c("#A11D21", "#003366", "#CC9900", "#663333", "#FF6600", "#CC9966", "#999966", "#006606", "#008091", "#041835", "#666666")
 theme_estat <- function(...) {
   theme <- ggplot2::theme_bw() +
     ggplot2::theme(
@@ -22,22 +22,38 @@ theme_estat <- function(...) {
   )
 }
 
-contagem <- Feminino %>% 
-  group_by(Color) %>%
-  summarise(Freq = n()) %>%
-  mutate(Prop = round(100*(Freq/sum(Freq)), 2)) %>%
-  arrange(desc(Color)) %>%
-  mutate(posicao = cumsum(Prop) - 0.5*Prop)
+tabela_5 <- tabela_4 %>%
+  filter(Categoria != "Na") %>%
+  group_by(Color, Categoria) %>%
+  summarise(freq = n()) %>%
+  mutate(
+    freq_relativa = case_when(
+      Color == 'Vermelho' ~ round(freq/sum(freq[Color == 'Vermelho'])*100, digits = 2),
+      Color == 'Verde' ~ round(freq/sum(freq[Color == 'Verde'])*100, digits = 2),
+      Color == 'Amarelo' ~ round(freq/sum(freq[Color == 'Amarelo'])*100, digits = 2),
+      Color == 'Branco' ~ round(freq/sum(freq[Color == 'Branco'])*100, digits = 2),
+      Color == 'Preto' ~ round(freq/sum(freq[Color == 'Preto'])*100, digits = 2),
+      Color == 'Azul' ~ round(freq/sum(freq[Color == 'Azul'])*100, digits = 2))
+  )
 
-ggplot(contagem) +
-  aes(x = factor(""), y = Prop , fill = factor(Color)) +
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar(theta = "y") +
-  geom_text(
-    aes(x = 1.8, y = posicao, label = paste0(Prop, "%")),
-    color = "black"
+
+porcentagens <- str_c(tabela_5$freq_relativa, "%") %>% str_replace("\\.", ",")
+
+legendas <- str_squish(str_c(tabela_5$freq, " (", porcentagens, ")"))
+
+ggplot(tabela_5) +
+  aes(
+    x = fct_reorder(Color, freq, .desc = T), y = freq,
+    fill = Categoria, label = legendas
   ) +
-  theme_void() +
-  theme(legend.position = "top") +
-  scale_fill_manual(values = cores_estat, name = 'Cores')
-ggsave("setorF.pdf", width = 158, height = 93, units = "mm")
+  geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = 0.5, hjust = -0.1,
+    size = 3
+  ) +
+  labs(x = "Cor", y = "Frequência") +
+  coord_flip() +
+  scale_y_continuous(limits = c(0,80)) +
+  theme_estat()
+ggsave("colunas-bi-freq.pdf", width = 158, height = 93, units = "mm")

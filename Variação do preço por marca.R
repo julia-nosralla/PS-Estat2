@@ -2,6 +2,8 @@ library(dplyr)
 
 Quadro_resumo <- Dados1 %>%
   filter (! duplicated(`Product ID`)) %>%
+  filter(Price != "NA") %>%
+  filter(Brand != "NA") %>%
   group_by(Brand)%>%
   summarise(media = mean(Price, na.rm = TRUE),
             desvio_p = sd(Price, na.rm = TRUE),

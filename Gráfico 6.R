@@ -1,5 +1,6 @@
-library(tidyverse)
 library(scales)
+library(tidyverse)
+
 
 cores_estat <- c("#A11D21", "#003366", "#CC9900", "#663333", "#FF6600", "#CC9966", "#999966", "#006606", "#008091", "#041835", "#666666")
 theme_estat <- function(...) {
@@ -21,27 +22,19 @@ theme_estat <- function(...) {
     )
   )
 }
+legendas <- str_squish(str_c(Quadro4$Média)) %>% str_replace("\\.", ",")
 
-Quadro2 <- Dados1 %>%
-  filter(Brand != "Na") %>%
-  filter(`Motivo devolução` != "NA") %>% 
-  filter (! duplicated(`Product ID`)) %>%
-  group_by(Brand, `Motivo devolução`) %>%
-  summarise(freq = n())
-
-legendas <- str_squish(str_c(Quadro2$freq))
-
-ggplot(Quadro2) +
-  aes(
-    x = fct_reorder(Brand, freq, .desc = T), y = freq,
-    fill = `Motivo devolução`, label = legendas
-  ) +
-  geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
+ggplot(Quadro4) +
+  aes(x = fct_reorder(Brand, Média, .desc=T), y = Média, label = legendas) +
+  geom_bar(stat = "identity", fill = "#A11D21", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
-    vjust = -0.5, hjust = 0.5,
+    vjust = 0.4, hjust =-0.1,
     size = 3
-  ) +
-  labs(x = "Marca", y = "Frequência") +
+  ) + 
+  labs(x = "Marca", y = "Avaliação média") +
+  coord_flip() +
+  scale_y_continuous(limits = c(0,3)) +
   theme_estat()
-ggsave("colunas-bi-freq2.pdf", width = 158, height = 93, units = "mm")
+ggsave("colunas-uni-freq.pdf", width = 158, height = 93, units = "mm")
+

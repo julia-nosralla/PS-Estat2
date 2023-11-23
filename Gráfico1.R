@@ -22,21 +22,11 @@ theme_estat <- function(...) {
   )
 }
 
-
-legendas <- str_squish(str_c(tabela_2$Total))
-
 ggplot(tabela_2) +
-  aes(
-    x = fct_reorder(as_factor(mes), mes), y = Total,
-    fill = Category, label = legendas
-  ) +
-  geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
-  geom_text(
-    position = position_dodge(width = .9),
-    vjust = -0.5, hjust = 0.5,
-    size = 3
-  ) +
-  labs(x = "Meses", y = "Faturamento") +
+  aes(x = as_factor(mes), y = Total, group = Categoria, colour = Categoria) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_colour_manual(name = "Categoria", labels = c("Feminino", "Infantil", "Masculino")) +
+  labs(x = "Mês", y = "Faturamento") +
   theme_estat()
-ggsave("colunas-bi-freq.pdf", width = 158, height = 93, units = "mm")
-
+ggsave("series_grupo.pdf", width = 158, height = 93, units = "mm")

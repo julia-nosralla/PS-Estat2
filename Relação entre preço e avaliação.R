@@ -6,11 +6,27 @@ Quadro <- Dados1 %>% filter(Price != "Na") %>%
 
 cor(Quadro$Price, Quadro$Rating)
 
-Quadro_resumo2 <-  Quadro %>%
-  summarise(media = mean(Rating),
-            desvio_p = sd(Rating),
-            min = min(Rating),
-            q25 = quantile(Rating, probs = .25, na.rm = TRUE),
-            mediana = quantile(Rating, probs = .5, na.rm = TRUE),
-            q75 = quantile(Rating, probs = .75, na.rm = TRUE), 
-            max = max(Rating))
+Quadro_resumo2 <- Quadro %>%
+  summarize(Média = round(mean(Rating),2),
+            `Desvio Padrão` = round(sd(Rating),2),
+            `Variância` = round(var(Rating),2),
+            `Mínimo` = round(min(Rating),2),
+            `1º Quartil` = round(quantile(Rating, probs = .25),2),
+            Mediana = round(quantile(Rating, probs = .5),2),
+            `3º Quartil` = round(quantile(Rating, probs = .75),2),
+            `Máximo` = round(max(Rating),2)) %>% t() %>% as.data.frame() %>% 
+  mutate(V1 = str_replace(V1,"\\.",","))
+
+Quadro_resumo3 <- Quadro %>%
+  summarize(Média = round(mean(Price),2),
+            `Desvio Padrão` = round(sd(Price),2),
+            `Variância` = round(var(Price),2),
+            `Mínimo` = round(min(Price),2),
+            `1º Quartil` = round(quantile(Price, probs = .25),2),
+            Mediana = round(quantile(Price, probs = .5),2),
+            `3º Quartil` = round(quantile(Price, probs = .75),2),
+            `Máximo` = round(max(Price),2)) %>% t() %>% as.data.frame() %>% 
+  mutate(V1 = str_replace(V1,"\\.",","))
+
+xtable::xtable(Quadro_resumo2)
+xtable::xtable(Quadro_resumo3)
